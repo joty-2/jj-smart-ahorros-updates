@@ -20,7 +20,7 @@ def crear_prestamo(w,Formulario):
     if not w.hay_socios():return
     d=Formulario('Préstamo: cuotas e interés mensual',w);d.resize(620,550)
     socio=d.socio(w.datos);fecha=d.fecha();capital=d.texto('Capital a entregar RD$:')
-    interes=d.texto('Interés mensual fijo (pesos RD$):','3000')
+    interes=d.texto('Interés mensual fijo (pesos RD$):','3,000.00')
     cuotas=QSpinBox();cuotas.setRange(1,1200);cuotas.setValue(12);d.form.addRow('Cuotas previstas (meses):',cuotas)
     primera=QDateEdit(fecha.date().addMonths(1));primera.setCalendarPopup(True);primera.setDisplayFormat('dd/MM/yyyy');d.form.addRow('Primera cuota de interés:',primera)
     fecha.dateChanged.connect(lambda value:primera.setDate(value.addMonths(1)))
@@ -59,6 +59,13 @@ def registrar_pago(w,Formulario):
     for p in loans:loan.addItem(f"{p['nombre']} · {p['id'][:8]} · {p['fecha']}",p['id'])
     tipo_pago=QComboBox();tipo_pago.addItem('Solo Interés','interes');tipo_pago.addItem('Solo Capital','capital')
     d.form.addRow('Préstamo:',loan);d.form.addRow('Aplicar pago a:',tipo_pago);fecha=d.fecha();total=d.texto('Monto a pagar RD$:');nota=d.texto('Nota (opcional):');key=str(uuid4())
+    btn_full=QPushButton('Usar cantidad completa pendiente')
+    d.form.addRow('',btn_full)
+    def llenar_completo():
+        s=w.datos.saldo_pago(loan.currentData(),fecha.date().toString('yyyy-MM-dd'))
+        val=s['interes'] if tipo_pago.currentData()=='interes' else s['capital']
+        total.setText(f"{val/100:,.2f}")
+    btn_full.clicked.connect(llenar_completo)
     def distribution():
         saldo=w.datos.saldo_pago(loan.currentData(),fecha.date().toString('yyyy-MM-dd'));amount=centavos(total.text() or '0')
         dest=tipo_pago.currentData()

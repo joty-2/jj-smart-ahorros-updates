@@ -1,3 +1,4 @@
+import time
 import base64, hashlib, json, os, platform, shutil, sqlite3, subprocess, sys, time, zipfile
 from datetime import datetime
 from pathlib import Path
@@ -132,7 +133,21 @@ def ejecutar_actualizacion(destino_app: Path, datos_dir: Path, zip_path: Path, m
                         shutil.rmtree(dst)
                     shutil.copytree(item, dst)
                 else:
-                    shutil.copy2(item, dst)
+                    for _intento in range(25):
+                        try:
+                            if os.name == 'nt' and dst.exists() and dst.suffix.lower() == '.exe':
+                                viejo = dst.with_name(dst.name + '.old')
+                                try:
+                                    if viejo.exists(): viejo.unlink()
+                                    dst.rename(viejo)
+                                except Exception:
+                                    pass
+                            shutil.copy2(item, dst)
+                            break
+                        except PermissionError:
+                            time.sleep(0.4)
+                    else:
+                        shutil.copy2(item, dst)
 
         shutil.rmtree(stg, ignore_errors=True)
         if db_actual.exists() and not verificar_integridad_db(db_actual):

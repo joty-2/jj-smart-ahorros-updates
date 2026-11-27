@@ -1,4 +1,10 @@
+import reparto_anual
 import sys
+if getattr(sys, 'frozen', False):
+    try:
+        _old = Path(sys.executable).with_name(Path(sys.executable).name + '.old')
+        if _old.exists(): _old.unlink()
+    except Exception: pass
 if '--aplicar-actualizacion' in sys.argv:
     idx = sys.argv.index('--aplicar-actualizacion')
     sys.argv = [sys.argv[0]] + sys.argv[idx+1:]
@@ -248,10 +254,8 @@ class Ventana(QMainWindow):
         from prestamos_interfaz import registrar_pago
         registrar_pago(self,Formulario)
     def anual(self):
-        year,ok=QInputDialog.getInt(self,'Resumen anual','Ano a resumir:',date.today().year,1900,date.today().year)
-        if not ok:return
-        r=self.datos.resumen(year)
-        QMessageBox.information(self,'Preparacion del cierre anual',f"Ano: {year}\nAportes de ese ano: {dinero(r['aportes_anuales'])}\nIntereses cobrados ese ano: {dinero(r['interes_anual'])}\n\nSaldo actual de caja: {dinero(r['caja'])}\nCapital pendiente actual: {dinero(r['capital_pendiente'])}\n\nRESUMEN PRELIMINAR. No distribuye ganancias ni cierra el ano. Falta acordar las reglas del reparto anual.")
+        from reparto_anual import abrir_reparto_anual
+        abrir_reparto_anual(self, self.datos)
     def respaldo(self):
         try:QMessageBox.information(self,'Respaldo creado','Copia guardada en:\n'+str(self.datos.respaldo()))
         except Exception as e:QMessageBox.warning(self,'Respaldo',str(e))
