@@ -1,3 +1,10 @@
+import sys
+if '--aplicar-actualizacion' in sys.argv:
+    idx = sys.argv.index('--aplicar-actualizacion')
+    sys.argv = [sys.argv[0]] + sys.argv[idx+1:]
+    import updater_independiente
+    updater_independiente.main()
+    sys.exit(0)
 import os, sys
 if sys.platform == 'darwin' and not getattr(sys, 'frozen', False):
     import PySide6; os.environ.setdefault('QT_QPA_PLATFORM_PLUGIN_PATH', os.path.join(os.path.dirname(PySide6.__file__), 'Qt', 'plugins', 'platforms'))

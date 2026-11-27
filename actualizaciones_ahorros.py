@@ -13,7 +13,7 @@ from ahorros_datos import ruta_datos
 from updater_independiente import canon, clave_plataforma, seleccionar_paquete
 
 APP = 'JJ_SMART_AHORROS'
-VERSION = '1.2.4'
+VERSION = '1.2.5'
 URL_GITHUB_DEFAULT = 'https://github.com/joty-2/jj-smart-ahorros-updates/releases/latest/download/'
 CANALES_ORDEN = {'interno': 0, 'piloto': 1, 'produccion': 2}
 
@@ -115,7 +115,7 @@ del "%~f0"
     else:
         destino = Path(__file__).resolve().parent; cmd_relanzar = [sys.executable, str(destino / 'main.py')]
     env = os.environ.copy(); env.pop('_MEIPASS2', None); env['PYINSTALLER_RESET_ENVIRONMENT'] = '1'
-    subprocess.Popen([sys.executable, str(upd_copia), str(destino), str(datos_dir), str(zip_path), str(manifest_path), str(pub_copia)] + cmd_relanzar, env=env, close_fds=True, start_new_session=True)
+    subprocess.Popen(([str(shutil.copy2(sys.executable, tmp_dir / Path(sys.executable).name)), '--aplicar-actualizacion', str(destino), str(datos_dir), str(zip_path), str(manifest_path), str(pub_copia)] + cmd_relanzar if getattr(sys, 'frozen', False) else [sys.executable, str(upd_copia), str(destino), str(datos_dir), str(zip_path), str(manifest_path), str(pub_copia)] + cmd_relanzar), env=env, close_fds=True, start_new_session=True)
 
 def confirmar_post_actualizacion(ventana):
     pend_path = ruta_datos() / 'Actualizaciones' / 'pendiente_confirmacion.json'
