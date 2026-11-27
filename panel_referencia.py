@@ -10,7 +10,7 @@ def aplicar(Ventana,logo):
     anterior=Ventana.__init__; refrescar_anterior=Ventana.refrescar
     def iniciar(self,datos):
         anterior(self,datos)
-        self.setWindowTitle('JJ SMART AHORROS 1.2.1')
+        self.setWindowTitle('JJ SMART AHORROS 1.2.2')
         # Conservar las páginas y sus acciones; sustituir únicamente el contenedor visual.
         viejo=self.takeCentralWidget();self._panel_anterior=viejo
         self.tabs.setParent(None)
@@ -137,4 +137,4 @@ def configuracion(w):
     opciones.append(('Cerrar',d.accept))
     for text,fn in opciones:
         b=QPushButton(text);b.clicked.connect(fn);box.addWidget(b)
-    box.addWidget(QLabel('JJ SMART AHORROS 1.2.1\nCreado por: José José Bautista'));d.exec()
+    box.addWidget(QLabel('JJ SMART AHORROS 1.2.2\nCreado por: José José Bautista'));d.exec()

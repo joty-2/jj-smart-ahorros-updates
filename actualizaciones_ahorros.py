@@ -13,7 +13,7 @@ from ahorros_datos import ruta_datos
 from updater_independiente import canon, clave_plataforma, seleccionar_paquete
 
 APP = 'JJ_SMART_AHORROS'
-VERSION = '1.2.1'
+VERSION = '1.2.2'
 URL_GITHUB_DEFAULT = 'https://github.com'
 CANALES_ORDEN = {'interno': 0, 'piloto': 1, 'produccion': 2}
 

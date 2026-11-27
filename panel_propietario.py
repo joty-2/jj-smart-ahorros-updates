@@ -68,7 +68,7 @@ class HiloPublicarMultiplataforma(QThread):
             run_id = ''
             for _ in range(12):
                 runs = json.loads(self._run([gh, 'run', 'list', '--repo', REPO_SLUG, '--limit', '1', '--json', 'databaseId,headBranch']))
-                if runs and runs.get('headBranch') == tag: run_id = str(runs['databaseId']); break
+                if runs and runs[0].get('headBranch') == tag: run_id = str(runs[0]['databaseId']); break
                 time.sleep(4)
             if not run_id: raise RuntimeError('No se detectó el workflow en GitHub Actions.')
             for intento in range(90):
