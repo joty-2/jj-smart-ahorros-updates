@@ -1,7 +1,7 @@
 """Panel visual; conserva servicios y formularios existentes."""
 from datetime import date
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QKeySequence, QShortcut,QSize
+from PySide6.QtCore import Qt, QTimer, QSize
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,QGridLayout,QScrollArea,QComboBox,QTableWidget,QHeaderView,QAbstractItemView,QDialog,QLineEdit)
 from ahorros_datos import dinero,ACCION
@@ -10,7 +10,7 @@ def aplicar(Ventana,logo):
     anterior=Ventana.__init__; refrescar_anterior=Ventana.refrescar
     def iniciar(self,datos):
         anterior(self,datos)
-        self.setWindowTitle('JJ SMART AHORROS 1.1.9')
+        self.setWindowTitle('JJ SMART AHORROS 1.2.1')
         # Conservar las páginas y sus acciones; sustituir únicamente el contenedor visual.
         viejo=self.takeCentralWidget();self._panel_anterior=viejo
         self.tabs.setParent(None)
@@ -98,7 +98,7 @@ def aplicar(Ventana,logo):
         movimientos(self)
         # La página Ahorros contiene exclusivamente aportes; el historial completo está en Ver Todos.
         self.llenar(self.aportes_table,[(m['fecha'],m['nombre'],'Ahorro',dinero(m['importe']),m['nota']) for m in self.datos.movimientos() if m['tipo']=='APORTE'])
-        self.statusBar().showMessage('Datos locales guardados · Versión 1.1.9')
+        self.statusBar().showMessage('Datos locales guardados · Versión 1.2.0')
     Ventana.__init__=iniciar;Ventana.refrescar=refrescar
 
 def movimientos(w):
@@ -123,7 +123,18 @@ def consultar(w):
 
 def configuracion(w):
     from recuperacion_ahorros import seguridad
-    d=QDialog(w);d.setWindowTitle('Configuración');box=QVBoxLayout(d)
-    for text,fn in [('Seguridad y recuperación de acceso',lambda:seguridad(w.datos,d)),('Actualizaciones del Sistema',lambda:__import__('actualizaciones_ahorros').Actualizaciones(w).exec()),('Control Propietario (Publicar)',lambda:w.abrir_control_propietario()),('Crear respaldo',w.respaldo),('Cerrar',d.accept)]:
+    from actualizaciones_ahorros import Actualizaciones, es_entorno_desarrollador
+    d=QDialog(w);d.setWindowTitle('Configuración · JJ SMART AHORROS');d.resize(460,340)
+    d.setStyleSheet('QDialog{background:#00162c;color:white;} QLabel{color:#a9d6ef;} QPushButton{background:#0b4f82;color:white;font-weight:bold;padding:10px;border:1px solid #3ea6e8;border-radius:8px;} QPushButton:hover{background:#1268a8;}')
+    box=QVBoxLayout(d)
+    opciones=[
+        ('🔄 Centro de actualizaciones',lambda:Actualizaciones(w).exec()),
+        ('🔐 Seguridad y recuperación de acceso',lambda:seguridad(w.datos,d)),
+        ('💾 Crear respaldo de base de datos',w.respaldo),
+    ]
+    if es_entorno_desarrollador():
+        opciones.append(('🚀 Publicar actualización (Desarrollador)',lambda:w.abrir_control_propietario()))
+    opciones.append(('Cerrar',d.accept))
+    for text,fn in opciones:
         b=QPushButton(text);b.clicked.connect(fn);box.addWidget(b)
-    box.addWidget(QLabel('JJ SMART AHORROS 1.1.9\nCreado por: José José Bautista'));d.exec()
+    box.addWidget(QLabel('JJ SMART AHORROS 1.2.1\nCreado por: José José Bautista'));d.exec()

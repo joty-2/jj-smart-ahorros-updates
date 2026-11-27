@@ -1,3 +1,6 @@
+import os, sys
+if sys.platform == 'darwin' and not getattr(sys, 'frozen', False):
+    import PySide6; os.environ.setdefault('QT_QPA_PLATFORM_PLUGIN_PATH', os.path.join(os.path.dirname(PySide6.__file__), 'Qt', 'plugins', 'platforms'))
 import impresion_ahorros
 """JJ SMART AHORROS 1.0 — aplicacion independiente del grupo de ahorro."""
 import csv
@@ -137,7 +140,7 @@ class Ventana(QMainWindow):
         self.recientes=QTableWidget(0,4);self.recientes.setHorizontalHeaderLabels(['Fecha','Socio','Movimiento','Importe']);self.recientes.setEditTriggers(QAbstractItemView.NoEditTriggers);self.recientes.setAlternatingRowColors(True)
         self.recientes.setSelectionBehavior(QAbstractItemView.SelectRows);self.recientes.verticalHeader().hide();self.recientes.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents);self.recientes.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch);self.recientes.horizontalHeader().setStretchLastSection(True);self.recientes.setMinimumHeight(190);self.recientes.setMaximumHeight(265);self.recientes.verticalHeader().setDefaultSectionSize(38);box.addWidget(self.recientes)
         self.empty_state=QLabel('Todavía no hay movimientos. Agrega un socio y registra su primer aporte.');self.empty_state.setObjectName('subtitle');self.empty_state.setWordWrap(True);box.addWidget(self.empty_state)
-        utilities=QHBoxLayout();self.add_button(utilities,'Resumen anual',self.anual).setObjectName('secondary');self.add_button(utilities,'Crear respaldo',self.respaldo).setObjectName('secondary');self.add_button(utilities,'🔄 Actualizaciones',self.abrir_actualizaciones).setObjectName('secondary');self.add_button(utilities,'🔐 Control Propietario',self.abrir_control_propietario).setObjectName('secondary');utilities.addStretch();box.addLayout(utilities)
+        utilities=QHBoxLayout();self.add_button(utilities,'Resumen anual',self.anual).setObjectName('secondary');self.add_button(utilities,'Crear respaldo',self.respaldo).setObjectName('secondary');self.add_button(utilities,'🔄 Actualizaciones',self.abrir_actualizaciones).setObjectName('secondary');btn_cp=self.add_button(utilities,'🔐 Control Propietario',self.abrir_control_propietario);btn_cp.setObjectName('secondary');btn_cp.setVisible(__import__('actualizaciones_ahorros').es_entorno_desarrollador());utilities.addStretch();box.addLayout(utilities)
         note=QLabel('Una acción = RD$100 · Aportes semanales variables · El reparto anual se definirá con las reglas del grupo.');note.setObjectName('subtitle');note.setWordWrap(True);box.addWidget(note);box.addStretch()
         scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(self.home);self.tabs.addTab(scroll,'Inicio')
         self.socios_tab,self.socios_table=self.tabla(['Código','Socio','Teléfono','Ahorro acumulado','Acciones','Capital pendiente','Estado de cuenta'],'Socios',[('+ Agregar socio',self.nuevo_socio),('✎ Editar nombre',self.editar_socio),('🗑 Eliminar socio',self.eliminar_socio)])
