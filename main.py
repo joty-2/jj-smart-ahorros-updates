@@ -93,7 +93,7 @@ class Ventana(QMainWindow):
     def __init__(self,datos):
         super().__init__()
         from PySide6.QtWidgets import QFrame,QGridLayout,QScrollArea,QSizePolicy
-        self.datos=datos;self.setWindowTitle('JJ SMART AHORROS 1.1.7')
+        self.datos=datos;self.setWindowTitle('JJ SMART AHORROS 1.1.8')
         area=QApplication.primaryScreen().availableGeometry()
         self.setMinimumSize(min(760,area.width()),min(460,area.height()-40))
         self.resize(min(1180,area.width()),min(800,max(460,area.height()-40)))
@@ -110,7 +110,7 @@ class Ventana(QMainWindow):
         security=QPushButton('Seguridad y acceso');security.setObjectName('secondary');security.clicked.connect(lambda:seguridad(self.datos,self));nav.addWidget(security)
         salir=QPushButton('Salir');salir.setObjectName('secondary');salir.clicked.connect(self.close);nav.addWidget(salir)
         nav.addStretch();local=QLabel('●  Funciona sin Internet');local.setStyleSheet('color:#50D9B7;font-size:11px;');nav.addWidget(local)
-        version_label=QLabel('Versión 1.1.7  ·  Datos en esta Mac');version_label.setObjectName('subtitle');version_label.setStyleSheet('font-size:10px;');nav.addWidget(version_label)
+        version_label=QLabel('Versión 1.1.8  ·  Datos en esta Mac');version_label.setObjectName('subtitle');version_label.setStyleSheet('font-size:10px;');nav.addWidget(version_label)
         outer.addWidget(side)
         content=QWidget();content.setObjectName('page');body=QVBoxLayout(content);body.setContentsMargins(22,18,22,10);body.setSpacing(18)
         header=QHBoxLayout();self.page_title=QLabel('Resumen del grupo');self.page_title.setObjectName('page_title');header.addWidget(self.page_title);header.addStretch()
@@ -204,7 +204,7 @@ class Ventana(QMainWindow):
             self.llenar(self.aportes_table,[(m['fecha'],m['nombre'],m['tipo'],dinero(m['importe']),m['nota']) for m in self.datos.movimientos()])
             self.llenar(self.prestamos_table,[(p['id'][:8],p['nombre'],p['fecha'],dinero(p['capital']),(dinero(p['interes_mensual']) if p['plan_mensual'] else 'Total anterior: '+dinero(p['interes'])),dinero(p['capital_pendiente']),dinero(p['interes_pendiente'])) for p in self.datos.prestamos()])
             rows=[('Aportes acumulados',r['aportes']),('Dinero en caja',r['caja']),('Capital por cobrar',r['capital_pendiente']),('Interes cobrado',r['interes_cobrado']),('Interés vencido pendiente',r['interes_pendiente']),('Caja + capital por cobrar',r['caja']+r['capital_pendiente'])]
-            self.llenar(self.balance_table,[(k,dinero(v)) for k,v in rows]);self.statusBar().showMessage('Datos locales guardados · Versión 1.1.7')
+            self.llenar(self.balance_table,[(k,dinero(v)) for k,v in rows]);self.statusBar().showMessage('Datos locales guardados · Versión 1.1.8')
         except Exception as e:QMessageBox.warning(self,'Datos',str(e))
     def _sel_soc(self):
         r=self.socios_table.currentRow()
@@ -278,7 +278,7 @@ def main():
     if not folder.exists() or not any(folder.glob('ahorros_'+date.today().strftime('%Y%m%d')+'_*')):
         try:datos.respaldo()
         except Exception as e:QMessageBox.warning(None,'Respaldo automatico','No se pudo guardar el respaldo diario: '+str(e))
-    window=Ventana(datos);window.showMaximized()
+    window=Ventana(datos);window.showFullScreen()
     from recuperacion_ahorros import recordar_configuracion
     QTimer.singleShot(150,lambda:recordar_configuracion(datos,window))
     sys.exit(app.exec())

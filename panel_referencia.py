@@ -9,7 +9,7 @@ def aplicar(Ventana,logo):
     anterior=Ventana.__init__; refrescar_anterior=Ventana.refrescar
     def iniciar(self,datos):
         anterior(self,datos)
-        self.setWindowTitle('JJ SMART AHORROS 1.1.7')
+        self.setWindowTitle('JJ SMART AHORROS 1.1.8')
         # Conservar las páginas y sus acciones; sustituir únicamente el contenedor visual.
         viejo=self.takeCentralWidget();self._panel_anterior=viejo
         self.tabs.setParent(None)
@@ -19,7 +19,7 @@ def aplicar(Ventana,logo):
         h=QHBoxLayout(top);h.setContentsMargins(22,12,22,12);h.addWidget(logo(84))
         brand=QLabel('<b><i>JJ SMART AHORROS</i></b><br><span style="font-size:14px;color:#a9d6ef">JJ SMART SOFTWARE</span>');brand.setStyleSheet('font-size:27px;');h.addWidget(brand)
         subtitle=QLabel('Sistema de Ahorro por Acciones y Préstamos');subtitle.setWordWrap(True);subtitle.setStyleSheet('font-size:15px;color:#bdd9ef;padding-left:18px;');h.addWidget(subtitle,1)
-        self.btn_volver=QPushButton('← Volver');self.btn_volver.setCursor(Qt.PointingHandCursor);self.btn_volver.setStyleSheet('QPushButton{background:#0b4f82;color:white;font-size:15px;font-weight:bold;padding:8px 16px;border:1px solid #3ea6e8;border-radius:10px;} QPushButton:hover{background:#1268a8;border:2px solid #73e4ff;}');self.btn_volver.hide();h.addWidget(self.btn_volver)
+        self.btn_volver=QPushButton('← Volver');self.btn_volver.setCursor(Qt.PointingHandCursor);self.btn_volver.setStyleSheet('QPushButton{background:#0b4f82;color:white;font-size:15px;font-weight:bold;padding:8px 16px;border:1px solid #3ea6e8;border-radius:10px;} QPushButton:hover{background:#1268a8;border:2px solid #73e4ff;}');self.btn_volver.hide();h.addWidget(self.btn_volver);self.btn_fs=QPushButton('⛶ Pantalla Completa');self.btn_fs.setCursor(Qt.PointingHandCursor);self.btn_fs.setStyleSheet('QPushButton{background:#0b4f82;color:white;font-size:13px;font-weight:bold;padding:8px 14px;border:1px solid #3ea6e8;border-radius:10px;} QPushButton:hover{background:#1268a8;}');self.btn_fs.clicked.connect(lambda:self.showMaximized() if self.isFullScreen() else self.showFullScreen());h.addWidget(self.btn_fs)
         outer.addWidget(top)
         body=QHBoxLayout();body.setSpacing(0);outer.addLayout(body,1)
         side=QWidget();side.setFixedWidth(205);side.setStyleSheet('background:#00203b;border-right:1px solid #14446b;');nav=QVBoxLayout(side);nav.setContentsMargins(9,18,9,16)
@@ -87,7 +87,7 @@ def aplicar(Ventana,logo):
         movimientos(self)
         # La página Ahorros contiene exclusivamente aportes; el historial completo está en Ver Todos.
         self.llenar(self.aportes_table,[(m['fecha'],m['nombre'],'Ahorro',dinero(m['importe']),m['nota']) for m in self.datos.movimientos() if m['tipo']=='APORTE'])
-        self.statusBar().showMessage('Datos locales guardados · Versión 1.1.7')
+        self.statusBar().showMessage('Datos locales guardados · Versión 1.1.8')
     Ventana.__init__=iniciar;Ventana.refrescar=refrescar
 
 def movimientos(w):
@@ -115,4 +115,4 @@ def configuracion(w):
     d=QDialog(w);d.setWindowTitle('Configuración');box=QVBoxLayout(d)
     for text,fn in [('Seguridad y recuperación de acceso',lambda:seguridad(w.datos,d)),('Actualizaciones del Sistema',lambda:__import__('actualizaciones_ahorros').Actualizaciones(w).exec()),('Control Propietario (Publicar)',lambda:w.abrir_control_propietario()),('Crear respaldo',w.respaldo),('Cerrar',d.accept)]:
         b=QPushButton(text);b.clicked.connect(fn);box.addWidget(b)
-    box.addWidget(QLabel('JJ SMART AHORROS 1.1.7\nCreado por: José José Bautista'));d.exec()
+    box.addWidget(QLabel('JJ SMART AHORROS 1.1.8\nCreado por: José José Bautista'));d.exec()
