@@ -59,7 +59,7 @@ def lanzar_updater_externo(zip_path: Path, manifest_path: Path):
         app_dir = exe_actual.parent
         stg = upd_dir / 'staging_win'
         bat = upd_dir / 'aplicar_update_win.bat'
-        bat_code = f'''@echo off
+        bat_code = rf'''@echo off
 chcp 65001 >nul
 timeout /t 2 /nobreak >nul
 :esperar_cierre
