@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (
     QComboBox, QDialog, QHBoxLayout, QInputDialog, QLabel,
     QLineEdit, QMessageBox, QProgressBar, QPushButton, QTextEdit, QVBoxLayout
 )
-from actualizaciones_ahorros import APP, VERSION, clave_dueno, leer_config_canal
+import actualizaciones_ahorros as _upd
+from actualizaciones_ahorros import APP, clave_dueno, leer_config_canal
 
 REPO_BUILD_DIR = Path('/tmp/jj_ahorros_repo_build')
 REPO_SLUG = 'joty-2/jj-smart-ahorros-updates'
@@ -127,8 +128,8 @@ class ControlPropietario(QDialog):
         self.setWindowTitle('Publicar actualización (Desarrollador) · JJ SMART AHORROS'); self.resize(700, 520)
         self.setStyleSheet('QDialog{background:#00162c;color:white;} QLabel{color:#e6f4ff;} QPushButton{background:#0b4f82;color:white;font-weight:bold;padding:10px 18px;border:1px solid #3ea6e8;border-radius:8px;} QTextEdit,QLineEdit,QComboBox{background:#001122;color:white;border:1px solid #1b527c;border-radius:6px;padding:6px;} QProgressBar{background:#001122;border:1px solid #1b527c;border-radius:6px;text-align:center;color:white;height:22px;} QProgressBar::chunk{background:#2ea043;border-radius:5px;}')
         cfg = leer_config_canal(); box = QVBoxLayout(self)
-        box.addWidget(QLabel(f'<b>Publicador Multiplataforma (Windows + macOS)</b> · Versión actual: v{VERSION}'))
-        r1 = QHBoxLayout(); p = VERSION.split('.')
+        box.addWidget(QLabel(f'<b>Publicador Multiplataforma (Windows + macOS)</b> · Versión actual: v{_upd.VERSION}'))
+        r1 = QHBoxLayout(); p = _upd.VERSION.split('.')
         self.inp_ver = QLineEdit(f'{p[0]}.{p[1]}.{int(p[2])+1}' if len(p)==3 and p[2].isdigit() else '1.2.1')
         self.cmb_etapa = QComboBox(); self.cmb_etapa.addItems(['produccion', 'piloto', 'interno']); self.cmb_etapa.setCurrentText(cfg.get('canal', 'produccion'))
         r1.addWidget(QLabel('Nueva versión:')); r1.addWidget(self.inp_ver); r1.addWidget(QLabel('Canal:')); r1.addWidget(self.cmb_etapa); box.addLayout(r1)

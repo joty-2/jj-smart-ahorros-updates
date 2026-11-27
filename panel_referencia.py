@@ -10,7 +10,7 @@ def aplicar(Ventana,logo):
     anterior=Ventana.__init__; refrescar_anterior=Ventana.refrescar
     def iniciar(self,datos):
         anterior(self,datos)
-        self.setWindowTitle('JJ SMART AHORROS 1.2.2')
+        self.setWindowTitle(f'JJ SMART AHORROS {__import__("actualizaciones_ahorros").VERSION}')
         # Conservar las páginas y sus acciones; sustituir únicamente el contenedor visual.
         viejo=self.takeCentralWidget();self._panel_anterior=viejo
         self.tabs.setParent(None)
@@ -98,7 +98,7 @@ def aplicar(Ventana,logo):
         movimientos(self)
         # La página Ahorros contiene exclusivamente aportes; el historial completo está en Ver Todos.
         self.llenar(self.aportes_table,[(m['fecha'],m['nombre'],'Ahorro',dinero(m['importe']),m['nota']) for m in self.datos.movimientos() if m['tipo']=='APORTE'])
-        self.statusBar().showMessage('Datos locales guardados · Versión 1.2.0')
+        self.statusBar().showMessage(f'Datos locales guardados · Versión {__import__("actualizaciones_ahorros").VERSION}')
     Ventana.__init__=iniciar;Ventana.refrescar=refrescar
 
 def movimientos(w):
@@ -137,4 +137,4 @@ def configuracion(w):
     opciones.append(('Cerrar',d.accept))
     for text,fn in opciones:
         b=QPushButton(text);b.clicked.connect(fn);box.addWidget(b)
-    box.addWidget(QLabel('JJ SMART AHORROS 1.2.2\nCreado por: José José Bautista'));d.exec()
+    box.addWidget(QLabel(f'JJ SMART AHORROS {__import__("actualizaciones_ahorros").VERSION}\nCreado por: José José Bautista'));d.exec()

@@ -96,7 +96,7 @@ class Ventana(QMainWindow):
     def __init__(self,datos):
         super().__init__()
         from PySide6.QtWidgets import QFrame,QGridLayout,QScrollArea,QSizePolicy
-        self.datos=datos;self.setWindowTitle('JJ SMART AHORROS 1.1.8')
+        self.datos=datos;self.setWindowTitle(f'JJ SMART AHORROS {__import__("actualizaciones_ahorros").VERSION}')
         area=QApplication.primaryScreen().availableGeometry()
         self.setMinimumSize(min(760,area.width()),min(460,area.height()-40))
         self.resize(min(1180,area.width()),min(800,max(460,area.height()-40)))
@@ -207,7 +207,7 @@ class Ventana(QMainWindow):
             self.llenar(self.aportes_table,[(m['fecha'],m['nombre'],m['tipo'],dinero(m['importe']),m['nota']) for m in self.datos.movimientos()])
             self.llenar(self.prestamos_table,[(p['id'][:8],p['nombre'],p['fecha'],dinero(p['capital']),(dinero(p['interes_mensual']) if p['plan_mensual'] else 'Total anterior: '+dinero(p['interes'])),dinero(p['capital_pendiente']),dinero(p['interes_pendiente'])) for p in self.datos.prestamos()])
             rows=[('Aportes acumulados',r['aportes']),('Dinero en caja',r['caja']),('Capital por cobrar',r['capital_pendiente']),('Interes cobrado',r['interes_cobrado']),('Interés vencido pendiente',r['interes_pendiente']),('Caja + capital por cobrar',r['caja']+r['capital_pendiente'])]
-            self.llenar(self.balance_table,[(k,dinero(v)) for k,v in rows]);self.statusBar().showMessage('Datos locales guardados · Versión 1.1.8')
+            self.llenar(self.balance_table,[(k,dinero(v)) for k,v in rows]);self.statusBar().showMessage(f'Datos locales guardados · Versión {__import__("actualizaciones_ahorros").VERSION}')
         except Exception as e:QMessageBox.warning(self,'Datos',str(e))
     def _sel_soc(self):
         r=self.socios_table.currentRow()
