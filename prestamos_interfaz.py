@@ -20,7 +20,7 @@ def crear_prestamo(w,Formulario):
     if not w.hay_socios():return
     d=Formulario('Préstamo: cuotas e interés mensual',w);d.resize(620,550)
     socio=d.socio(w.datos);fecha=d.fecha();capital=d.texto('Capital a entregar RD$:')
-    interes=d.texto('Interés mensual fijo RD$:','0')
+    interes=d.texto('Interés mensual fijo (pesos RD$):','3000')
     cuotas=QSpinBox();cuotas.setRange(1,1200);cuotas.setValue(12);d.form.addRow('Cuotas previstas (meses):',cuotas)
     primera=QDateEdit(fecha.date().addMonths(1));primera.setCalendarPopup(True);primera.setDisplayFormat('dd/MM/yyyy');d.form.addRow('Primera cuota de interés:',primera)
     fecha.dateChanged.connect(lambda value:primera.setDate(value.addMonths(1)))
@@ -41,7 +41,7 @@ def crear_prestamo(w,Formulario):
             c=centavos(capital.text());m=centavos(interes.text());f=fecha.date().toString('yyyy-MM-dd');p=primera.date().toString('yyyy-MM-dd')
             w.datos.monto(c,True);w.datos.monto(m)
             if p<f:raise ValueError('La primera cuota no puede ser anterior al desembolso.')
-            text=f"Socio: {socio.currentText()}\nCapital: {dinero(c)}\nInterés mensual fijo: {dinero(m)}\nCuotas previstas: {cuotas.value()}\nPrimera cuota: {primera.date().toString('dd/MM/yyyy')}\n\nCapital variable, primero interés vencido. ¿Registrar el desembolso?"
+            text=f"Socio: {socio.currentText()}\nCapital: {dinero(c)}\nInterés mensual fijo: {dinero(m)} ({m//100} pesos)\nCuotas previstas: {cuotas.value()}\nPrimera cuota: {primera.date().toString('dd/MM/yyyy')}\n\nCapital variable, primero interés vencido. ¿Registrar el desembolso?"
             if QMessageBox.question(d,'Confirmar préstamo',text,QMessageBox.Yes|QMessageBox.No,QMessageBox.No)!=QMessageBox.Yes:return
             def registrar():
                 w.datos.prestar_mensual(key,socio.currentData(),f,c,m,cuotas.value(),p,nota.text())
@@ -82,7 +82,11 @@ def registrar_pago(w,Formulario):
             if amount<=0:raise ValueError('Introduce el monto recibido.')
             mensaje=f"Pago recibido: {dinero(amount)}\nPrimero a interés: {dinero(interest)}\nLuego a capital: {dinero(cap)}\nCapital restante: {dinero(saldo['capital']-cap)}\n\n¿Guardar este pago?"
             if QMessageBox.question(d,'Confirmar pago',mensaje,QMessageBox.Yes|QMessageBox.No,QMessageBox.No)!=QMessageBox.Yes:return
-            d.registrar(lambda:w.datos.pagar(key,loan.currentData(),fecha.date().toString('yyyy-MM-dd'),amount,nota.text(),tipo_pago.currentData()),'Pago guardado: '+dinero(interest)+' a interés y '+dinero(cap)+' a capital.',w)
+            pid,fec_iso,nt_txt,dest_sel=loan.currentData(),fecha.date().toString('yyyy-MM-dd'),nota.text(),tipo_pago.currentData()
+            d.registrar(lambda:w.datos.pagar(key,pid,fec_iso,amount,nt_txt,dest_sel),'Pago guardado: '+dinero(interest)+' a interés y '+dinero(cap)+' a capital.',w)
+            if d.result()==QDialog.Accepted:
+                from impresion_ahorros import imprimir_recibo_prestamo
+                imprimir_recibo_prestamo(w,w.datos,pid,fec_iso,interest,cap,saldo['capital']-cap,saldo['interes']-interest,nt_txt,key)
         except Exception as e:QMessageBox.warning(d,'No se registró',str(e))
     d.buttons.accepted.connect(save);d.exec()
 

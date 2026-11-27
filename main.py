@@ -2,8 +2,8 @@ import sys
 if '--aplicar-actualizacion' in sys.argv:
     idx = sys.argv.index('--aplicar-actualizacion')
     sys.argv = [sys.argv[0]] + sys.argv[idx+1:]
-    import updater_independiente
-    updater_independiente.main()
+    import runpy
+    runpy.run_module('updater_independiente', run_name='__main__')
     sys.exit(0)
 import os, sys
 if sys.platform == 'darwin' and not getattr(sys, 'frozen', False):
@@ -117,6 +117,7 @@ class Ventana(QMainWindow):
             b=QPushButton(text);b.setObjectName('nav');b.setCheckable(True);b.setChecked(i==0)
             b.clicked.connect(lambda checked=False,index=i:self.tabs.setCurrentIndex(index));nav.addWidget(b);self.nav_buttons.append(b)
         from recuperacion_ahorros import seguridad
+        rep_btn=QPushButton('📊 Reparto Anual y Reportes');rep_btn.setObjectName('secondary');rep_btn.clicked.connect(lambda: __import__('reparto_anual').abrir_reparto_anual(self,self.datos));nav.addWidget(rep_btn)
         security=QPushButton('Seguridad y acceso');security.setObjectName('secondary');security.clicked.connect(lambda:seguridad(self.datos,self));nav.addWidget(security)
         salir=QPushButton('Salir');salir.setObjectName('secondary');salir.clicked.connect(self.close);nav.addWidget(salir)
         nav.addStretch();local=QLabel('●  Funciona sin Internet');local.setStyleSheet('color:#50D9B7;font-size:11px;');nav.addWidget(local)
