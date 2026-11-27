@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from ahorros_datos import ruta_datos
 from updater_independiente import canon
 
-VERSION = '1.1.5'
+VERSION = '1.1.6'
 APP = 'JJ_SMART_AHORROS'
 CANALES_ORDEN = {'interno': 0, 'piloto': 1, 'produccion': 2}
 URL_GITHUB_DEFAULT = 'https://github.com/joty-2/jj-smart-ahorros-updates/releases/latest/download/'
