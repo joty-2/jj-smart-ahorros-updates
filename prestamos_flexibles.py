@@ -61,7 +61,7 @@ class Datos(DatosBase):
             db.execute('INSERT INTO prestamos_mensuales(prestamo_id,cuotas_previstas,interes_mensual,primer_vencimiento) VALUES (?,?,?,?)',(key,cuotas,interes_mensual,primera))
             self.validar_caja(db)
 
-    def pagar(self,key,prestamo,fecha,total,nota=''):
+    def pagar(self,key,prestamo,fecha,total,nota='',destino='auto'):
         fecha=self.fecha(fecha);self.monto(total,True);nota=nota.strip()
         with self.conexion() as db:
             db.execute('BEGIN IMMEDIATE')
@@ -72,8 +72,15 @@ class Datos(DatosBase):
             last=db.execute('SELECT MAX(fecha) FROM abonos WHERE prestamo_id=?',(prestamo,)).fetchone()[0]
             if last and fecha<last:raise ValueError('Registra el pago con fecha igual o posterior al ultimo pago de este prestamo.')
             saldo=self._saldo(db,prestamo,fecha)
-            if total>saldo['capital']+saldo['interes']:raise ValueError('El pago supera el capital y el interes vencido pendientes. No se cobran intereses futuros.')
-            interest=min(total,saldo['interes']);cap=total-interest
+            if destino=='interes':
+                if total>saldo['interes']:raise ValueError('El pago supera el interés vencido pendiente.')
+                interest,cap=total,0
+            elif destino=='capital':
+                if total>saldo['capital']:raise ValueError('El pago supera el capital pendiente.')
+                interest,cap=0,total
+            else:
+                if total>saldo['capital']+saldo['interes']:raise ValueError('El pago supera el capital y el interes vencido pendientes. No se cobran intereses futuros.')
+                interest=min(total,saldo['interes']);cap=total-interest
             if cap>saldo['capital']:raise ValueError('El pago supera el capital pendiente.')
             db.execute('INSERT INTO abonos(id,prestamo_id,fecha,capital,interes,nota) VALUES (?,?,?,?,?,?)',(key,prestamo,fecha,cap,interest,nota))
             if saldo['plan'] and cap==saldo['capital']:

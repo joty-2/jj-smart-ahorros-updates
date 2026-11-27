@@ -57,11 +57,17 @@ def registrar_pago(w,Formulario):
     d=Formulario('Registrar pago de préstamo',w);d.resize(600,450)
     loan=QComboBox()
     for p in loans:loan.addItem(f"{p['nombre']} · {p['id'][:8]} · {p['fecha']}",p['id'])
-    d.form.addRow('Préstamo:',loan);fecha=d.fecha();total=d.texto('Dinero recibido RD$:');nota=d.texto('Nota (opcional):');key=str(uuid4())
+    tipo_pago=QComboBox();tipo_pago.addItem('Solo Interés','interes');tipo_pago.addItem('Solo Capital','capital')
+    d.form.addRow('Préstamo:',loan);d.form.addRow('Aplicar pago a:',tipo_pago);fecha=d.fecha();total=d.texto('Monto a pagar RD$:');nota=d.texto('Nota (opcional):');key=str(uuid4())
     def distribution():
         saldo=w.datos.saldo_pago(loan.currentData(),fecha.date().toString('yyyy-MM-dd'));amount=centavos(total.text() or '0')
-        interest=min(amount,saldo['interes']);cap=amount-interest
-        if amount>saldo['capital']+saldo['interes']:raise ValueError('El monto supera la deuda a esta fecha. No se cobran intereses futuros.')
+        dest=tipo_pago.currentData()
+        if dest=='interes':
+            if amount>saldo['interes']:raise ValueError('Supera el interés pendiente.')
+            interest,cap=amount,0
+        else:
+            if amount>saldo['capital']:raise ValueError('Supera el capital pendiente.')
+            interest,cap=0,amount
         return saldo,amount,interest,cap
     def show():
         try:
@@ -69,14 +75,14 @@ def registrar_pago(w,Formulario):
             legacy='\nPréstamo anterior: conserva su interés total acordado.' if saldo['plan'] is None else '\nInterés mensual fijo: '+dinero(saldo['plan']['interes_mensual'])
             d.info.setText('Interés vencido pendiente: '+dinero(saldo['interes'])+'\nCapital pendiente: '+dinero(saldo['capital'])+legacy+'\n\nEste pago: '+dinero(interest)+' a interés y '+dinero(cap)+' a capital.')
         except Exception as e:d.info.setText(str(e))
-    loan.currentIndexChanged.connect(show);fecha.dateChanged.connect(show);total.textChanged.connect(show);show()
+    loan.currentIndexChanged.connect(show);tipo_pago.currentIndexChanged.connect(show);fecha.dateChanged.connect(show);total.textChanged.connect(show);show()
     def save():
         try:
             saldo,amount,interest,cap=distribution()
             if amount<=0:raise ValueError('Introduce el monto recibido.')
             mensaje=f"Pago recibido: {dinero(amount)}\nPrimero a interés: {dinero(interest)}\nLuego a capital: {dinero(cap)}\nCapital restante: {dinero(saldo['capital']-cap)}\n\n¿Guardar este pago?"
             if QMessageBox.question(d,'Confirmar pago',mensaje,QMessageBox.Yes|QMessageBox.No,QMessageBox.No)!=QMessageBox.Yes:return
-            d.registrar(lambda:w.datos.pagar(key,loan.currentData(),fecha.date().toString('yyyy-MM-dd'),amount,nota.text()),'Pago guardado: '+dinero(interest)+' a interés y '+dinero(cap)+' a capital.',w)
+            d.registrar(lambda:w.datos.pagar(key,loan.currentData(),fecha.date().toString('yyyy-MM-dd'),amount,nota.text(),tipo_pago.currentData()),'Pago guardado: '+dinero(interest)+' a interés y '+dinero(cap)+' a capital.',w)
         except Exception as e:QMessageBox.warning(d,'No se registró',str(e))
     d.buttons.accepted.connect(save);d.exec()
 

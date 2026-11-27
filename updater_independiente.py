@@ -168,7 +168,7 @@ def ejecutar_actualizacion(destino_app: Path, datos_dir: Path, zip_path: Path, m
             env = os.environ.copy()
             env.pop('_MEIPASS2', None)
             env['PYINSTALLER_RESET_ENVIRONMENT'] = '1'
-            subprocess.Popen(cmd_relanzar, env=env, close_fds=True)
+            subprocess.Popen(cmd_relanzar, env=env, close_fds=True, start_new_session=True)
 
 if __name__ == '__main__':
     if len(sys.argv) >= 6:

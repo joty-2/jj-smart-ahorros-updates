@@ -13,7 +13,7 @@ from ahorros_datos import ruta_datos
 from updater_independiente import canon, clave_plataforma, seleccionar_paquete
 
 APP = 'JJ_SMART_AHORROS'
-VERSION = '1.2.3'
+VERSION = '1.2.4'
 URL_GITHUB_DEFAULT = 'https://github.com/joty-2/jj-smart-ahorros-updates/releases/latest/download/'
 CANALES_ORDEN = {'interno': 0, 'piloto': 1, 'produccion': 2}
 
@@ -115,7 +115,7 @@ del "%~f0"
     else:
         destino = Path(__file__).resolve().parent; cmd_relanzar = [sys.executable, str(destino / 'main.py')]
     env = os.environ.copy(); env.pop('_MEIPASS2', None); env['PYINSTALLER_RESET_ENVIRONMENT'] = '1'
-    subprocess.Popen([sys.executable, str(upd_copia), str(destino), str(datos_dir), str(zip_path), str(manifest_path), str(pub_copia)] + cmd_relanzar, env=env, close_fds=True)
+    subprocess.Popen([sys.executable, str(upd_copia), str(destino), str(datos_dir), str(zip_path), str(manifest_path), str(pub_copia)] + cmd_relanzar, env=env, close_fds=True, start_new_session=True)
 
 def confirmar_post_actualizacion(ventana):
     pend_path = ruta_datos() / 'Actualizaciones' / 'pendiente_confirmacion.json'
@@ -274,7 +274,7 @@ class Actualizaciones(QDialog):
 
     def _error_descarga(self, err):
         self.lbl_estado.setText('⚠️ ' + err); self.btn_instalar.setEnabled(True); self.btn_buscar.setEnabled(True)
-        registrar_historial({'version': self.pendiente['version'] if self.pendiente else '?', 'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'estado': 'Descarga fallida', 'notas': err})
+        registrar_historial({'version': next(iter(self.pendiente))['version'] if self.pendiente else '?', 'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'estado': 'Descarga fallida', 'notas': err})
         self._cargar_historial()
 
     def _usb(self):
@@ -288,7 +288,7 @@ class Actualizaciones(QDialog):
         except Exception as e: QMessageBox.warning(self, 'Paquete USB inválido', str(e))
 
     def _lanzar(self, zp, mp):
-        m = self.pendiente if self.pendiente else {}
+        m = next(iter(self.pendiente)) if self.pendiente else {}
         if QMessageBox.question(self, 'Instalar actualización', f'Se respaldará ahorros.db y la versión actual, se cerrará JJ SMART AHORROS, se instalará v{m.get("version","")} y se reiniciará automáticamente.\n\n¿Deseas continuar?') == QMessageBox.Yes:
             lanzar_updater_externo(Path(zp), Path(mp), str(m.get('version', '')), str(m.get('notes', ''))); os._exit(0)
         else: self.btn_instalar.setEnabled(True); self.btn_buscar.setEnabled(True)
