@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from ahorros_datos import ruta_datos
 from updater_independiente import canon
 
-VERSION = '1.1.8'
+VERSION = '1.1.9'
 APP = 'JJ_SMART_AHORROS'
 CANALES_ORDEN = {'interno': 0, 'piloto': 1, 'produccion': 2}
 URL_GITHUB_DEFAULT = 'https://github.com/joty-2/jj-smart-ahorros-updates/releases/latest/download/'
@@ -51,11 +51,56 @@ def verificar_manifiesto(doc: dict, pub: bytes, canal_cliente: str) -> dict:
     return m
 
 def lanzar_updater_externo(zip_path: Path, manifest_path: Path):
-    app_dir = Path(__file__).resolve().parent; datos_dir = ruta_datos()
-    upd_copia = datos_dir / 'Actualizaciones' / 'updater_independiente.py'
-    upd_copia.parent.mkdir(parents=True, exist_ok=True)
+    datos_dir = ruta_datos()
+    upd_dir = datos_dir / 'Actualizaciones'
+    upd_dir.mkdir(parents=True, exist_ok=True)
+    if getattr(sys, 'frozen', False) and os.name == 'nt':
+        exe_actual = Path(sys.executable).resolve()
+        app_dir = exe_actual.parent
+        stg = upd_dir / 'staging_win'
+        bat = upd_dir / 'aplicar_update_win.bat'
+        bat_code = f'''@echo off
+chcp 65001 >nul
+timeout /t 2 /nobreak >nul
+:esperar_cierre
+tasklist /FI "IMAGENAME eq {exe_actual.name}" 2>NUL | find /I "{exe_actual.name}" >NUL
+if "%ERRORLEVEL%"=="0" (
+    timeout /t 1 /nobreak >nul
+    goto esperar_cierre
+)
+if not exist "{datos_dir}\Respaldos_Rollback" mkdir "{datos_dir}\Respaldos_Rollback"
+if exist "{datos_dir}\ahorros.db" copy /Y "{datos_dir}\ahorros.db" "{datos_dir}\Respaldos_Rollback\ahorros_pre_update.db" >nul
+if exist "{stg}" rmdir /S /Q "{stg}"
+powershell -NoProfile -Command "Expand-Archive -LiteralPath '{zip_path}' -DestinationPath '{stg}' -Force"
+if exist "{upd_dir}\JJ_SMART_AHORROS_new.exe" (
+    :copiar_exe_directo
+    move /Y "{upd_dir}\JJ_SMART_AHORROS_new.exe" "{exe_actual}" >nul 2>&1
+    if errorlevel 1 (
+        timeout /t 1 /nobreak >nul
+        goto copiar_exe_directo
+    )
+) else if exist "{stg}\JJ_SMART_AHORROS.exe" (
+    :copiar_exe
+    copy /Y "{stg}\JJ_SMART_AHORROS.exe" "{exe_actual}" >nul 2>&1
+    if errorlevel 1 (
+        timeout /t 1 /nobreak >nul
+        goto copiar_exe
+    )
+) else (
+    robocopy "{stg}" "{app_dir}" /E /XF ahorros.db privada.key >nul
+)
+rmdir /S /Q "{stg}" >nul 2>&1
+start "" "{exe_actual}"
+del "%~f0"
+'''
+        bat.write_text(bat_code, encoding='utf-8')
+        flags = getattr(subprocess, 'CREATE_NO_WINDOW', 0) | getattr(subprocess, 'DETACHED_PROCESS', 0) | getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0)
+        subprocess.Popen(['cmd.exe', '/c', str(bat)], creationflags=flags, close_fds=True)
+        return
+    app_dir = Path(__file__).resolve().parent
+    upd_copia = upd_dir / 'updater_independiente.py'
     shutil.copy2(app_dir / 'updater_independiente.py', upd_copia)
-    cmd = [sys.executable] if getattr(sys, 'frozen', False) else [sys.executable, str(app_dir / 'main.py')]
+    cmd = [sys.executable, str(app_dir / 'main.py')]
     args = [sys.executable, str(upd_copia), str(app_dir), str(datos_dir), str(zip_path), str(manifest_path)] + cmd
     flags = (getattr(subprocess, 'DETACHED_PROCESS', 0) | getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0)) if os.name == 'nt' else 0
     subprocess.Popen(args, creationflags=flags, close_fds=True)
@@ -95,7 +140,17 @@ class HiloDescargar(QThread):
                     out.write(ch); h.update(ch); self.progreso.emit(f"Descargando v{self.m['version']}: {tot * 100 // esp}%")
             if tot != esp or h.hexdigest() != self.m['sha256']:
                 zp.unlink(missing_ok=True); raise ValueError('Integridad SHA-256 fallida.')
-            mp.write_text(self.raw, encoding='utf-8'); self.listo.emit(str(zp), str(mp))
+            mp.write_text(self.raw, encoding='utf-8')
+            if getattr(sys, 'frozen', False) and os.name == 'nt':
+                exe_new = self.dest / 'JJ_SMART_AHORROS_new.exe'
+                self.progreso.emit(f"Descargando ejecutable Windows v{self.m['version']}...")
+                req_exe = Request(self.url + 'JJ_SMART_AHORROS.exe', headers={'User-Agent': 'JJSmartAhorros/1.0'})
+                with _opener.open(req_exe, timeout=90) as rexe, exe_new.open('wb') as oexe:
+                    shutil.copyfileobj(rexe, oexe, 262144)
+                if exe_new.stat().st_size < 10_000_000:
+                    exe_new.unlink(missing_ok=True)
+                    raise ValueError('Ejecutable Windows incompleto en el servidor.')
+            self.listo.emit(str(zp), str(mp))
         except Exception as e: self.error.emit(str(e))
 
 class Actualizaciones(QDialog):
@@ -149,7 +204,7 @@ class Actualizaciones(QDialog):
 
     def _lanzar(self, zp, mp):
         if QMessageBox.question(self, 'Instalar actualización', 'Se respaldará ahorros.db y el programa, se cerrará la app y se instalará la mejora.\n\n¿Continuar?') == QMessageBox.Yes:
-            lanzar_updater_externo(Path(zp), Path(mp)); QApplication.quit()
+            lanzar_updater_externo(Path(zp), Path(mp)); os._exit(0)
 
 def verificar_notificacion_inicio(ventana):
     try:

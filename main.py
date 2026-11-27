@@ -278,7 +278,7 @@ def main():
     if not folder.exists() or not any(folder.glob('ahorros_'+date.today().strftime('%Y%m%d')+'_*')):
         try:datos.respaldo()
         except Exception as e:QMessageBox.warning(None,'Respaldo automatico','No se pudo guardar el respaldo diario: '+str(e))
-    window=Ventana(datos);window.showFullScreen()
+    window=Ventana(datos);window.showFullScreen();QTimer.singleShot(50,window.showFullScreen)
     from recuperacion_ahorros import recordar_configuracion
     QTimer.singleShot(150,lambda:recordar_configuracion(datos,window))
     sys.exit(app.exec())
