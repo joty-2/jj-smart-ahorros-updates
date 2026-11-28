@@ -13,7 +13,7 @@ from ahorros_datos import ruta_datos
 from updater_independiente import canon, clave_plataforma, seleccionar_paquete
 
 APP = 'JJ_SMART_AHORROS'
-VERSION = '1.2.9'
+VERSION = '1.2.10'
 URL_GITHUB_DEFAULT = 'https://github.com/joty-2/jj-smart-ahorros-updates/releases/latest/download/'
 CANALES_ORDEN = {'interno': 0, 'piloto': 1, 'produccion': 2}
 
@@ -91,11 +91,17 @@ if exist "{datos_dir}\ahorros.db" copy /Y "{datos_dir}\ahorros.db" "{datos_dir}\
 copy /Y "{exe_actual}" "{datos_dir}\Respaldos_Rollback\{exe_actual.name}.bak" >nul 2>&1
 if exist "{stg}" rmdir /S /Q "{stg}"
 powershell -NoProfile -Command "Expand-Archive -LiteralPath '{zip_path}' -DestinationPath '{stg}' -Force"
-if exist "{stg}\JJ_SMART_AHORROS.exe" (
-    :copiar_exe
-    move /Y "{stg}\JJ_SMART_AHORROS.exe" "{exe_actual}" >nul 2>&1
-    if errorlevel 1 (timeout /t 1 /nobreak >nul & goto copiar_exe)
-) else (robocopy "{stg}" "{app_dir}" /E /XF ahorros.db privada.key >nul)
+if not exist "{stg}\JJ_SMART_AHORROS.exe" goto copiar_carpeta
+:copiar_exe
+move /Y "{stg}\JJ_SMART_AHORROS.exe" "{exe_actual}" >nul 2>&1
+if errorlevel 1 (
+    timeout /t 1 /nobreak >nul
+    goto copiar_exe
+)
+goto fin_copia
+:copiar_carpeta
+robocopy "{stg}" "{app_dir}" /E /XF ahorros.db privada.key >nul
+:fin_copia
 rmdir /S /Q "{stg}" >nul 2>&1
 set "_MEIPASS2="
 set "PYINSTALLER_RESET_ENVIRONMENT=1"

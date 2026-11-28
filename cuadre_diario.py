@@ -12,7 +12,7 @@ def abrir_cuadre_diario(parent, datos):
 
     top = QHBoxLayout()
     lbl_t = QLabel("Arqueo y Cuadre de Caja")
-    lbl_t.setStyleSheet("font-size:15px; font-weight:bold; color:#00363d;")
+    lbl_t.setStyleSheet("font-size:15px; font-weight:bold; color:#51E0D0;")
     cfg_dia = ruta_datos() / "dia_reunion.txt"
     cmb_dia = QComboBox()
     for nom, num in [("Domingo",7),("Lunes",1),("Martes",2),("Miércoles",3),("Jueves",4),("Viernes",5),("Sábado",6)]:
@@ -45,7 +45,7 @@ def abrir_cuadre_diario(parent, datos):
         l.setStyleSheet("font-size:13px; font-weight:bold;")
     lbl_ent.setStyleSheet("font-size:13px; font-weight:bold; color:#0b7a4b;")
     lbl_sal.setStyleSheet("font-size:13px; font-weight:bold; color:#b42318;")
-    lbl_neto.setStyleSheet("font-size:14px; font-weight:bold; color:#00363d;")
+    lbl_neto.setStyleSheet("font-size:14px; font-weight:bold; color:#51E0D0;")
     lbl_caja.setStyleSheet("font-size:14px; font-weight:bold; color:#086AC7;")
 
     form.addRow("(+) Aportes de Ahorro recibidos:", lbl_ap)
@@ -96,7 +96,7 @@ def abrir_cuadre_diario(parent, datos):
         iso, ap, ic, cp, entradas, pr, neto, caja_tot, cnt = res["val"]
         ahora = datetime.now().strftime("%d/%m/%Y %I:%M %p")
         lineas = [(f"Emitido: {ahora}", False), (f"Fecha Cuadrada: {iso} ({cnt} operaciones)", True), ("--------------------------------------------------", False), (f"(+) Aportes recibidos: {dinero(ap)}", False), (f"(+) Intereses cobrados: {dinero(ic)}", False), (f"(+) Capital recuperado: {dinero(cp)}", False), (f"= TOTAL ENTRADAS: {dinero(entradas)}", True), (f"(-) Préstamos entregados: {dinero(pr)}", False), (f"= FLUJO NETO DEL DÍA: {dinero(neto)}", True), (f"SALDO EN CAJA ACUMULADO: {dinero(caja_tot)}", True)]
-        html = f"<div style='font-family:Helvetica,Arial;padding:10px;color:#111;font-size:11px;'><h3 style='margin:0;color:#00363d;'>JJ SMART AHORROS</h3><p style='margin:2px 0 6px;color:#555;'>Cuadre Diario de Caja · {iso}</p><hr><table style='width:100%;font-size:11px;'><tr><td>(+) Aportes recibidos:</td><td style='text-align:right;'>{dinero(ap)}</td></tr><tr><td>(+) Intereses cobrados:</td><td style='text-align:right;'>{dinero(ic)}</td></tr><tr><td>(+) Capital recuperado:</td><td style='text-align:right;'>{dinero(cp)}</td></tr><tr style='background:#eef7f2;'><td><b>= TOTAL ENTRADAS:</b></td><td style='text-align:right;'><b>{dinero(entradas)}</b></td></tr><tr><td>(-) Préstamos entregados:</td><td style='text-align:right;'>{dinero(pr)}</td></tr><tr style='background:#f4f8fa;'><td><b>= FLUJO NETO DEL DÍA:</b></td><td style='text-align:right;'><b>{dinero(neto)}</b></td></tr><tr style='background:#e6f0fa;'><td><b>SALDO TOTAL EN CAJA:</b></td><td style='text-align:right;'><b>{dinero(caja_tot)}</b></td></tr></table><div style='margin-top:16px;padding-top:8px;border-top:1px dashed #ccc;text-align:center;font-family:Georgia,serif;font-style:italic;color:rgba(0,54,61,0.65);font-size:11.5px;font-weight:600;letter-spacing:1.4px;'>JJSMART AHORRO CREADO POR JOSE JOSE BAUTISTA</div></div>"
+        html = f"<div style='font-family:Helvetica,Arial;padding:10px;color:#111;font-size:11px;'><h3 style='margin:0;color:#51E0D0;'>JJ SMART AHORROS</h3><p style='margin:2px 0 6px;color:#555;'>Cuadre Diario de Caja · {iso}</p><hr><table style='width:100%;font-size:11px;'><tr><td>(+) Aportes recibidos:</td><td style='text-align:right;'>{dinero(ap)}</td></tr><tr><td>(+) Intereses cobrados:</td><td style='text-align:right;'>{dinero(ic)}</td></tr><tr><td>(+) Capital recuperado:</td><td style='text-align:right;'>{dinero(cp)}</td></tr><tr style='background:#eef7f2;'><td><b>= TOTAL ENTRADAS:</b></td><td style='text-align:right;'><b>{dinero(entradas)}</b></td></tr><tr><td>(-) Préstamos entregados:</td><td style='text-align:right;'>{dinero(pr)}</td></tr><tr style='background:#f4f8fa;'><td><b>= FLUJO NETO DEL DÍA:</b></td><td style='text-align:right;'><b>{dinero(neto)}</b></td></tr><tr style='background:#e6f0fa;'><td><b>SALDO TOTAL EN CAJA:</b></td><td style='text-align:right;'><b>{dinero(caja_tot)}</b></td></tr></table><div style='margin-top:16px;padding-top:8px;border-top:1px dashed #ccc;text-align:center;font-family:Georgia,serif;font-style:italic;color:rgba(0,54,61,0.65);font-size:11.5px;font-weight:600;letter-spacing:1.4px;'>JJSMART AHORRO CREADO POR JOSE JOSE BAUTISTA</div></div>"
         _mostrar_vista_previa(d, f"Cuadre Diario - {iso}", f"Cuadre_{iso}", "COMPROBANTE DE CUADRE DIARIO DE CAJA", lineas, html, ancho=430, alto=470)
 
     f_edit.dateChanged.connect(calcular)

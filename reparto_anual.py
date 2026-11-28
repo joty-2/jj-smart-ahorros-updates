@@ -36,7 +36,7 @@ def abrir_reparto_anual(parent, datos):
     d = QDialog(parent); d.setWindowTitle("Reportes Semanales y Cierre Anual · JJ SMART AHORROS"); d.resize(980, 680)
     lay = QVBoxLayout(d); cfg = _leer_cfg(); hist = _leer_historial()
     lbl_t = QLabel("El reparto se hará según las reglas del ahorro o la cooperativa")
-    lbl_t.setStyleSheet("font-size:15px; font-weight:bold; color:#00363d; padding:2px 0;"); lay.addWidget(lbl_t)
+    lbl_t.setStyleSheet("font-size:15px; font-weight:bold; color:#51E0D0; padding:2px 0;"); lay.addWidget(lbl_t)
     tabs = QTabWidget(); lay.addWidget(tabs, 1)
 
     tab_anual = QWidget(); la = QVBoxLayout(tab_anual); bar_hist = QHBoxLayout()
@@ -54,7 +54,7 @@ def abrir_reparto_anual(parent, datos):
     la.addLayout(bar_hist)
 
     box = QGroupBox("Reglas del Reparto Anual (Escribir, Foto o Documento)"); rlay = QVBoxLayout(box); top_r = QHBoxLayout()
-    lbl_doc = QLabel(f"Archivo cargado: {cfg.get('archivo_reglas') or 'Ninguno aún'}"); lbl_doc.setStyleSheet("font-weight:bold; color:#00363d;")
+    lbl_doc = QLabel(f"Archivo cargado: {cfg.get('archivo_reglas') or 'Ninguno aún'}"); lbl_doc.setStyleSheet("font-weight:bold; color:#51E0D0;")
     btn_subir = QPushButton("📎 Subir Foto o Documento"); btn_ver = QPushButton("👁 Ver Archivo")
     top_r.addWidget(lbl_doc, 1); top_r.addWidget(btn_subir); top_r.addWidget(btn_ver); rlay.addLayout(top_r)
 
@@ -66,7 +66,7 @@ def abrir_reparto_anual(parent, datos):
     form.addRow("% Intereses Préstamos a repartir:", sp_pct); form.addRow("Criterio:", cmb_crit); form.addRow("Reglas escritas:", txt_reg)
     rlay.addLayout(form); la.addWidget(box)
 
-    lbl_res = QLabel(); lbl_res.setStyleSheet("font-weight:bold; padding:6px; background:#eef5f7; border-radius:4px;"); la.addWidget(lbl_res)
+    lbl_res = QLabel(); lbl_res.setStyleSheet("font-weight:bold; padding:6px; background:#13243A; color:#51E0D0; border:1px solid #29415B; border-radius:8px;"); la.addWidget(lbl_res)
     tbl = QTableWidget(0, 6); tbl.setHorizontalHeaderLabels(["Código", "Socio", "Ahorro Acumulado", "% Participación", "Utilidad Préstamos", "TOTAL A RECIBIR"])
     tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch); la.addWidget(tbl, 1)
 
@@ -143,7 +143,7 @@ def abrir_reparto_anual(parent, datos):
     txt_bus_s = QLineEdit(); txt_bus_s.setPlaceholderText("🔍 Buscar socio, semana o movimiento...")
     bar_s.addWidget(QLabel("Año:")); bar_s.addWidget(cmb_yr_s); bar_s.addWidget(QLabel("Semana:")); bar_s.addWidget(cmb_sem); bar_s.addWidget(txt_bus_s, 1)
     ls.addLayout(bar_s)
-    lbl_res_s = QLabel(); lbl_res_s.setStyleSheet("font-weight:bold; padding:6px; background:#eef5f7; border-radius:4px;"); ls.addWidget(lbl_res_s)
+    lbl_res_s = QLabel(); lbl_res_s.setStyleSheet("font-weight:bold; padding:6px; background:#13243A; color:#51E0D0; border:1px solid #29415B; border-radius:8px;"); ls.addWidget(lbl_res_s)
     tbl_s = QTableWidget(0, 6); tbl_s.setHorizontalHeaderLabels(["Semana", "Fecha", "Socio", "Operación", "Monto", "Detalle"])
     tbl_s.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch); ls.addWidget(tbl_s, 1)
 
